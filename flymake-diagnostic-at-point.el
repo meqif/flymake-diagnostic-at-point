@@ -35,21 +35,35 @@
   :type 'number
   :safe #'numberp)
 
+(defcustom flymake-diagnostic-at-point-error-prefix "➤ "
+  "String to be displayed before every error line in the popup.")
+
+(defcustom flymake-diagnostic-at-point-display-diagnostic-function
+  'flymake-diagnostic-at-point-display-posframe
+  "The function to be used to display the diagnostic message.")
+
 (defvar-local flymake-diagnostic-at-point-timer nil
   "Timer to automatically show the error at point in a popup.")
 
 (defvar-local flymake-diagnostic-at-point-posframe-buffer " *flymake-diagnostic-at-point-posframe-buffer*")
+
+(defun flymake-diagnostic-at-point-get-diagnostic-text ()
+  (flymake--diag-text (get-char-property (point) 'flymake-diagnostic)))
+
+(defun flymake-diagnostic-at-point-display-posframe (text)
+  (posframe-show flymake-diagnostic-at-point-posframe-buffer
+                 :string (concat flymake-diagnostic-at-point-error-prefix text)
+                 :background-color (face-background 'popup-face)
+                 :foreground-color (face-foreground 'popup-face)
+                 :position (point)))
 
 (defun flymake-diagnostic-at-point-maybe-display ()
   (when (and flymake-mode
              (get-char-property (point) 'flymake-diagnostic))
     (with-current-buffer (get-buffer-create flymake-diagnostic-at-point-posframe-buffer)
       (erase-buffer))
-    (posframe-show flymake-diagnostic-at-point-posframe-buffer
-                   :string (help-at-pt-string)
-                   :background-color (face-background 'popup-face)
-                   :foreground-color (face-foreground 'popup-face)
-                   :position (point))
+    (let ((text (flymake-diagnostic-at-point-get-diagnostic-text)))
+      (funcall flymake-diagnostic-at-point-display-diagnostic-function text))
     (add-hook 'pre-command-hook #'flymake-diagnostic-at-point-delete-popup nil t)))
 
 (defun flymake-diagnostic-at-point-delete-popup ()
