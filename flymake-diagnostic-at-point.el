@@ -45,12 +45,18 @@
 (defvar-local flymake-diagnostic-at-point-timer nil
   "Timer to automatically show the error at point in a popup.")
 
-(defvar-local flymake-diagnostic-at-point-posframe-buffer " *flymake-diagnostic-at-point-posframe-buffer*")
+(defvar-local flymake-diagnostic-at-point-posframe-buffer
+  " *flymake-diagnostic-at-point-posframe-buffer*")
 
 (defun flymake-diagnostic-at-point-get-diagnostic-text ()
+  "Get the flymake diagnostic text for the thing at point."
   (flymake--diag-text (get-char-property (point) 'flymake-diagnostic)))
 
 (defun flymake-diagnostic-at-point-display-posframe (text)
+  "Display the flymake diagnostic TEXT inside a popup.
+
+The popup is rendered using posframe, which creates a child frame
+and allows some nice customization and avoids some bugs in popup.el."
   (posframe-show flymake-diagnostic-at-point-posframe-buffer
                  :string (concat flymake-diagnostic-at-point-error-prefix text)
                  :background-color (face-background 'popup-face)
@@ -58,6 +64,10 @@
                  :position (point)))
 
 (defun flymake-diagnostic-at-point-maybe-display ()
+  "Display the flymake diagnostic text for the thing at point.
+
+The diagnostic text will be rendered using the function defined
+in `flymake-diagnostic-at-point-display-diagnostic-function.'"
   (when (and flymake-mode
              (get-char-property (point) 'flymake-diagnostic))
     (with-current-buffer (get-buffer-create flymake-diagnostic-at-point-posframe-buffer)
@@ -67,10 +77,12 @@
     (add-hook 'pre-command-hook #'flymake-diagnostic-at-point-delete-popup nil t)))
 
 (defun flymake-diagnostic-at-point-delete-popup ()
+  "Delete the popup with the diagnostic information."
   (posframe-delete-frame flymake-diagnostic-at-point-posframe-buffer))
 
 ;;;###autoload
 (defun flymake-diagnostic-at-point-set-timer ()
+  "Set the error display timer for the current buffer."
   (interactive)
   (flymake-diagnostic-at-point-cancel-timer)
   (unless flymake-diagnostic-at-point-timer
@@ -88,11 +100,13 @@
       (setq flymake-diagnostic-at-point-timer nil))))
 
 (defun flymake-diagnostic-at-point-setup ()
+  "Setup the hooks for `flymake-diagnostic-at-point-mode'."
   (add-hook 'focus-out-hook #'flymake-diagnostic-at-point-cancel-timer nil 'local)
   (add-hook 'focus-in-hook #'flymake-diagnostic-at-point-set-timer nil 'local)
   (add-hook 'post-command-hook #'flymake-diagnostic-at-point-set-timer nil 'local))
 
 (defun flymake-diagnostic-at-point-teardown ()
+  "Remove the hooks for `flymake-diagnostic-at-point-mode'."
   (remove-hook 'focus-out-hook #'flymake-diagnostic-at-point-cancel-timer 'local)
   (remove-hook 'focus-in-hook #'flymake-diagnostic-at-point-set-timer 'local)
   (remove-hook 'post-command-hook #'flymake-diagnostic-at-point-set-timer 'local))
