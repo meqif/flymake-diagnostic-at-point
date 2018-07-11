@@ -36,11 +36,18 @@
   :safe #'numberp)
 
 (defcustom flymake-diagnostic-at-point-error-prefix "➤ "
-  "String to be displayed before every error line in the popup.")
+  "String to be displayed before every error line in the popup."
+  :group 'flymake-diagnostic-at-point
+  :type '(choice (const :tag "No prefix" nil)
+                 string))
 
 (defcustom flymake-diagnostic-at-point-display-diagnostic-function
   'flymake-diagnostic-at-point-display-posframe
-  "The function to be used to display the diagnostic message.")
+  "The function to be used to display the diagnostic message."
+  :group 'flymake-diagnostic-at-point
+  :type '(choice (const :tag "Display error messages in a popup"
+                        flymake-diagnostic-at-point-display-posframe)
+                 (function :tag "Error display function")))
 
 (defvar-local flymake-diagnostic-at-point-timer nil
   "Timer to automatically show the error at point in a popup.")
