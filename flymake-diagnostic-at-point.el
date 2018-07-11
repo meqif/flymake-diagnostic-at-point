@@ -57,11 +57,14 @@
 
 The popup is rendered using posframe, which creates a child frame
 and allows some nice customization and avoids some bugs in popup.el."
+  (with-current-buffer (get-buffer-create flymake-diagnostic-at-point-posframe-buffer)
+    (erase-buffer))
   (posframe-show flymake-diagnostic-at-point-posframe-buffer
                  :string (concat flymake-diagnostic-at-point-error-prefix text)
                  :background-color (face-background 'popup-face)
                  :foreground-color (face-foreground 'popup-face)
-                 :position (point)))
+                 :position (point))
+  (add-hook 'pre-command-hook #'flymake-diagnostic-at-point-delete-popup nil t))
 
 (defun flymake-diagnostic-at-point-maybe-display ()
   "Display the flymake diagnostic text for the thing at point.
@@ -70,11 +73,8 @@ The diagnostic text will be rendered using the function defined
 in `flymake-diagnostic-at-point-display-diagnostic-function.'"
   (when (and flymake-mode
              (get-char-property (point) 'flymake-diagnostic))
-    (with-current-buffer (get-buffer-create flymake-diagnostic-at-point-posframe-buffer)
-      (erase-buffer))
     (let ((text (flymake-diagnostic-at-point-get-diagnostic-text)))
-      (funcall flymake-diagnostic-at-point-display-diagnostic-function text))
-    (add-hook 'pre-command-hook #'flymake-diagnostic-at-point-delete-popup nil t)))
+      (funcall flymake-diagnostic-at-point-display-diagnostic-function text))))
 
 (defun flymake-diagnostic-at-point-delete-popup ()
   "Delete the popup with the diagnostic information."
