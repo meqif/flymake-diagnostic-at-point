@@ -114,17 +114,32 @@ in `flymake-diagnostic-at-point-display-diagnostic-function.'"
       (cancel-timer flymake-diagnostic-at-point-timer)
       (setq flymake-diagnostic-at-point-timer nil))))
 
+(defun flymake-diagnostic-at-point-handle-focus-change ()
+  "Set or cancel flymake message display timer after the frame focus changes."
+  (if (frame-focus-state)
+      (flymake-diagnostic-at-point-set-timer)
+    (flymake-diagnostic-at-point-cancel-timer)))
+
 (defun flymake-diagnostic-at-point-setup ()
   "Setup the hooks for `flymake-diagnostic-at-point-mode'."
-  (add-hook 'focus-out-hook #'flymake-diagnostic-at-point-cancel-timer nil 'local)
-  (add-hook 'focus-in-hook #'flymake-diagnostic-at-point-set-timer nil 'local)
-  (add-hook 'post-command-hook #'flymake-diagnostic-at-point-set-timer nil 'local))
+  (add-hook 'post-command-hook #'flymake-diagnostic-at-point-set-timer nil 'local)
+  (if (version< emacs-version "27.0")
+      (progn
+        (add-hook 'focus-out-hook #'flymake-diagnostic-at-point-cancel-timer nil 'local)
+        (add-hook 'focus-in-hook #'flymake-diagnostic-at-point-set-timer nil 'local))
+    (add-function :after
+                  (local 'after-focus-change-function)
+                  #'flymake-diagnostic-at-point-handle-focus-change)))
 
 (defun flymake-diagnostic-at-point-teardown ()
   "Remove the hooks for `flymake-diagnostic-at-point-mode'."
-  (remove-hook 'focus-out-hook #'flymake-diagnostic-at-point-cancel-timer 'local)
-  (remove-hook 'focus-in-hook #'flymake-diagnostic-at-point-set-timer 'local)
-  (remove-hook 'post-command-hook #'flymake-diagnostic-at-point-set-timer 'local))
+  (remove-hook 'post-command-hook #'flymake-diagnostic-at-point-set-timer 'local)
+  (if (version< emacs-version "27.0")
+      (progn
+        (remove-hook 'focus-out-hook #'flymake-diagnostic-at-point-cancel-timer 'local)
+        (remove-hook 'focus-in-hook #'flymake-diagnostic-at-point-set-timer 'local))
+    (remove-function 'after-focus-change-function
+                     #'flymake-diagnostic-at-point-handle-focus-change)))
 
 (define-minor-mode flymake-diagnostic-at-point-mode
   "Minor mode for displaying flymake diagnostics at point in a popup."
