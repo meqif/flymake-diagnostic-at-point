@@ -43,13 +43,13 @@
                  string))
 
 (defcustom flymake-diagnostic-at-point-display-diagnostic-function
-  'flymake-diagnostic-at-point-display-posframe
+  'flymake-diagnostic-at-point-display-popup
   "The function to be used to display the diagnostic message."
   :group 'flymake-diagnostic-at-point
   :type '(choice (const :tag "Display error messages in a popup"
-                        flymake-diagnostic-at-point-display-posframe)
+                        flymake-diagnostic-at-point-display-popup)
                  (const :tag "Display error messages in the minibuffer"
-                        flymake-diagnostic-at-point-display-lv)
+                        flymake-diagnostic-at-point-display-minibuffer)
                  (function :tag "Error display function")))
 
 (defvar-local flymake-diagnostic-at-point-timer nil
@@ -62,7 +62,7 @@
   "Get the flymake diagnostic text for the thing at point."
   (flymake--diag-text (get-char-property (point) 'flymake-diagnostic)))
 
-(defun flymake-diagnostic-at-point-display-posframe (text)
+(defun flymake-diagnostic-at-point-display-popup (text)
   "Display the flymake diagnostic TEXT inside a popup.
 
 The popup is rendered using posframe, which creates a child frame
@@ -77,7 +77,7 @@ and allows some nice customization and avoids some bugs in popup.el."
                  :position (point))
   (add-hook 'pre-command-hook #'flymake-diagnostic-at-point-delete-popup nil t))
 
-(defun flymake-diagnostic-at-point-display-lv (text)
+(defun flymake-diagnostic-at-point-display-minibuffer (text)
   "Display the flymake diagnostic TEXT persistently in the minibuffer."
   (lv-message (concat flymake-diagnostic-at-point-error-prefix text))
   (add-hook 'pre-command-hook #'lv-delete-window))
