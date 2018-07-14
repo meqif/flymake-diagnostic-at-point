@@ -1,8 +1,9 @@
-;;; flymake-diagnostic-at-point-mode.el ---            -*- lexical-binding: t; -*-
+;;; flymake-diagnostic-at-point.el --- Display flymake diagnostics at point  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018  Ricardo Martins
+;; Copyright (C) 2018 Ricardo Martins
 
 ;; Author: Ricardo Martins <ricardo@scarybox.net>
+;; URL: https://github.com/meqif/flymake-diagnostic-at-point
 ;; Keywords: convenience, languages, tools
 ;; Version: 1.0.0
 ;; Package-Requires: ((emacs "26.1") (posframe "0.4.1") (lv "0.1"))
@@ -22,7 +23,13 @@
 
 ;;; Commentary:
 
+;; Display flymake diagnostics at point in a convenient way.
 ;;
+;; The display function can be customized through the variable
+;; `flymake-diagnostic-at-point-display-diagnostic-function' to show the
+;; diagnostics in a popup, in the minibuffer, or in some other way.
+;;
+;; Check out the README for more information.
 
 ;;; Code:
 
@@ -37,7 +44,7 @@
   :safe #'numberp)
 
 (defcustom flymake-diagnostic-at-point-error-prefix "➤ "
-  "String to be displayed before every error line in the popup."
+  "String to be displayed before every error line."
   :group 'flymake-diagnostic-at-point
   :type '(choice (const :tag "No prefix" nil)
                  string))
@@ -53,7 +60,7 @@
                  (function :tag "Error display function")))
 
 (defvar-local flymake-diagnostic-at-point-timer nil
-  "Timer to automatically show the error at point in a popup.")
+  "Timer to automatically show the error at point.")
 
 (defvar-local flymake-diagnostic-at-point-posframe-buffer
   " *flymake-diagnostic-at-point-posframe-buffer*")
@@ -63,10 +70,7 @@
   (flymake--diag-text (get-char-property (point) 'flymake-diagnostic)))
 
 (defun flymake-diagnostic-at-point-display-popup (text)
-  "Display the flymake diagnostic TEXT inside a popup.
-
-The popup is rendered using posframe, which creates a child frame
-and allows some nice customization and avoids some bugs in popup.el."
+  "Display the flymake diagnostic TEXT inside a popup."
   (with-current-buffer
       (get-buffer-create flymake-diagnostic-at-point-posframe-buffer)
     (erase-buffer))
@@ -148,7 +152,7 @@ in `flymake-diagnostic-at-point-display-diagnostic-function.'"
                      #'flymake-diagnostic-at-point-handle-focus-change)))
 
 (define-minor-mode flymake-diagnostic-at-point-mode
-  "Minor mode for displaying flymake diagnostics at point in a popup."
+  "Minor mode for displaying flymake diagnostics at point."
   :lighter nil
   :group flymake-diagnostic-at-point
   (cond
