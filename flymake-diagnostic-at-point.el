@@ -67,7 +67,8 @@
 
 The popup is rendered using posframe, which creates a child frame
 and allows some nice customization and avoids some bugs in popup.el."
-  (with-current-buffer (get-buffer-create flymake-diagnostic-at-point-posframe-buffer)
+  (with-current-buffer
+      (get-buffer-create flymake-diagnostic-at-point-posframe-buffer)
     (erase-buffer))
   (posframe-show flymake-diagnostic-at-point-posframe-buffer
                  :string (concat flymake-diagnostic-at-point-error-prefix text)
@@ -102,8 +103,9 @@ in `flymake-diagnostic-at-point-display-diagnostic-function.'"
   (flymake-diagnostic-at-point-cancel-timer)
   (unless flymake-diagnostic-at-point-timer
     (setq flymake-diagnostic-at-point-timer
-          (run-with-idle-timer
-           flymake-diagnostic-at-point-timer-delay nil #'flymake-diagnostic-at-point-maybe-display))))
+          (run-with-idle-timer flymake-diagnostic-at-point-timer-delay
+                               nil
+                               #'flymake-diagnostic-at-point-maybe-display))))
 
 ;;;###autoload
 (defun flymake-diagnostic-at-point-cancel-timer ()
@@ -125,8 +127,10 @@ in `flymake-diagnostic-at-point-display-diagnostic-function.'"
   (add-hook 'post-command-hook #'flymake-diagnostic-at-point-set-timer nil 'local)
   (if (version< emacs-version "27.0")
       (progn
-        (add-hook 'focus-out-hook #'flymake-diagnostic-at-point-cancel-timer nil 'local)
-        (add-hook 'focus-in-hook #'flymake-diagnostic-at-point-set-timer nil 'local))
+        (add-hook 'focus-out-hook
+                  #'flymake-diagnostic-at-point-cancel-timer nil 'local)
+        (add-hook 'focus-in-hook
+                  #'flymake-diagnostic-at-point-set-timer nil 'local))
     (add-function :after
                   (local 'after-focus-change-function)
                   #'flymake-diagnostic-at-point-handle-focus-change)))
@@ -136,8 +140,10 @@ in `flymake-diagnostic-at-point-display-diagnostic-function.'"
   (remove-hook 'post-command-hook #'flymake-diagnostic-at-point-set-timer 'local)
   (if (version< emacs-version "27.0")
       (progn
-        (remove-hook 'focus-out-hook #'flymake-diagnostic-at-point-cancel-timer 'local)
-        (remove-hook 'focus-in-hook #'flymake-diagnostic-at-point-set-timer 'local))
+        (remove-hook 'focus-out-hook
+                     #'flymake-diagnostic-at-point-cancel-timer 'local)
+        (remove-hook 'focus-in-hook
+                     #'flymake-diagnostic-at-point-set-timer 'local))
     (remove-function 'after-focus-change-function
                      #'flymake-diagnostic-at-point-handle-focus-change)))
 
