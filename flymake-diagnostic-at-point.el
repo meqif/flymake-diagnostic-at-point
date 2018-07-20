@@ -6,7 +6,7 @@
 ;; URL: https://github.com/meqif/flymake-diagnostic-at-point
 ;; Keywords: convenience, languages, tools
 ;; Version: 1.0.0
-;; Package-Requires: ((emacs "26.1") (posframe "0.4.1") (lv "0.1"))
+;; Package-Requires: ((emacs "26.1") (pos-tip "0.4.6") (lv "0.1")
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@
 ;;; Code:
 
 (require 'flymake)
-(require 'posframe)
 (require 'lv)
 
 (defcustom flymake-diagnostic-at-point-timer-delay 0.5
@@ -62,24 +61,13 @@
 (defvar-local flymake-diagnostic-at-point-timer nil
   "Timer to automatically show the error at point.")
 
-(defvar-local flymake-diagnostic-at-point-posframe-buffer
-  " *flymake-diagnostic-at-point-posframe-buffer*")
-
 (defun flymake-diagnostic-at-point-get-diagnostic-text ()
   "Get the flymake diagnostic text for the thing at point."
   (flymake--diag-text (get-char-property (point) 'flymake-diagnostic)))
 
 (defun flymake-diagnostic-at-point-display-popup (text)
   "Display the flymake diagnostic TEXT inside a popup."
-  (with-current-buffer
-      (get-buffer-create flymake-diagnostic-at-point-posframe-buffer)
-    (erase-buffer))
-  (posframe-show flymake-diagnostic-at-point-posframe-buffer
-                 :string (concat flymake-diagnostic-at-point-error-prefix text)
-                 :background-color (face-background 'popup-face)
-                 :foreground-color (face-foreground 'popup-face)
-                 :position (point))
-  (add-hook 'pre-command-hook #'flymake-diagnostic-at-point-delete-popup nil t))
+  (pop-tip-show (concat flymake-diagnostic-at-point-error-prefix text)))
 
 (defun flymake-diagnostic-at-point-display-minibuffer (text)
   "Display the flymake diagnostic TEXT persistently in the minibuffer."
@@ -95,10 +83,6 @@ in `flymake-diagnostic-at-point-display-diagnostic-function.'"
              (get-char-property (point) 'flymake-diagnostic))
     (let ((text (flymake-diagnostic-at-point-get-diagnostic-text)))
       (funcall flymake-diagnostic-at-point-display-diagnostic-function text))))
-
-(defun flymake-diagnostic-at-point-delete-popup ()
-  "Delete the popup with the diagnostic information."
-  (posframe-delete-frame flymake-diagnostic-at-point-posframe-buffer))
 
 ;;;###autoload
 (defun flymake-diagnostic-at-point-set-timer ()
