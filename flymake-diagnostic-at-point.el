@@ -6,7 +6,7 @@
 ;; URL: https://github.com/meqif/flymake-diagnostic-at-point
 ;; Keywords: convenience, languages, tools
 ;; Version: 1.0.0
-;; Package-Requires: ((emacs "26.1") (pos-tip "0.4.6") (lv "0.1")
+;; Package-Requires: ((emacs "26.1") (pos-tip "0.4.6"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@
 ;;; Code:
 
 (require 'flymake)
-(require 'lv)
 
 (defcustom flymake-diagnostic-at-point-timer-delay 0.5
   "Delay in seconds before displaying errors at point."
@@ -70,9 +69,8 @@
   (pop-tip-show (concat flymake-diagnostic-at-point-error-prefix text)))
 
 (defun flymake-diagnostic-at-point-display-minibuffer (text)
-  "Display the flymake diagnostic TEXT persistently in the minibuffer."
-  (lv-message (concat flymake-diagnostic-at-point-error-prefix text))
-  (add-hook 'pre-command-hook #'lv-delete-window))
+  "Display the flymake diagnostic TEXT in the minibuffer."
+  (message (concat flymake-diagnostic-at-point-error-prefix text)))
 
 (defun flymake-diagnostic-at-point-maybe-display ()
   "Display the flymake diagnostic text for the thing at point.
