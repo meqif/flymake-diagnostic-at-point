@@ -34,6 +34,7 @@
 ;;; Code:
 
 (require 'flymake)
+(require 'pos-tip)
 
 (defcustom flymake-diagnostic-at-point-timer-delay 0.5
   "Delay in seconds before displaying errors at point."
