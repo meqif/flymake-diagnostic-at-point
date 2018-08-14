@@ -67,7 +67,7 @@
 
 (defun flymake-diagnostic-at-point-display-popup (text)
   "Display the flymake diagnostic TEXT inside a popup."
-  (pop-tip-show (concat flymake-diagnostic-at-point-error-prefix text)))
+  (pos-tip-show (concat flymake-diagnostic-at-point-error-prefix text)))
 
 (defun flymake-diagnostic-at-point-display-minibuffer (text)
   "Display the flymake diagnostic TEXT in the minibuffer."
