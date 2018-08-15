@@ -5,7 +5,7 @@
 ;; Author: Ricardo Martins <ricardo@scarybox.net>
 ;; URL: https://github.com/meqif/flymake-diagnostic-at-point
 ;; Keywords: convenience, languages, tools
-;; Version: 1.1.0
+;; Version: 1.2.0
 ;; Package-Requires: ((emacs "26.1") (popup "0.5.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
