@@ -18,8 +18,9 @@ Add the following to your `init.el`:
 
 ``` emacs-lisp
 (eval-after-load 'flymake
-  (require 'flymake-diagnostic-at-point)
-  (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode))
+  (progn
+    (require 'flymake-diagnostic-at-point)
+    (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode)))
 ```
 
 Alternatively, if you prefer using `use-package`:
