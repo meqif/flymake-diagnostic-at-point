@@ -58,6 +58,12 @@
                         flymake-diagnostic-at-point-display-minibuffer)
                  (function :tag "Error display function")))
 
+(defcustom flymake-diagnostic-at-point-hide-diagnostic-function 'nil
+  "The function to be used to hide the diagnostic message (if needed)."
+  :group 'flymake-diagnostic-at-point
+  :type '(choice (const :tag "None" nil)
+                 (function :tag "Error hide function")))
+
 (defvar-local flymake-diagnostic-at-point-timer nil
   "Timer to automatically show the error at point.")
 
@@ -78,10 +84,12 @@
 
 The diagnostic text will be rendered using the function defined
 in `flymake-diagnostic-at-point-display-diagnostic-function.'"
-  (when (and flymake-mode
-             (get-char-property (point) 'flymake-diagnostic))
-    (let ((text (flymake-diagnostic-at-point-get-diagnostic-text)))
-      (funcall flymake-diagnostic-at-point-display-diagnostic-function text))))
+  (if (and flymake-mode
+           (get-char-property (point) 'flymake-diagnostic))
+      (let ((text (flymake-diagnostic-at-point-get-diagnostic-text)))
+        (funcall flymake-diagnostic-at-point-display-diagnostic-function text))
+    (when flymake-diagnostic-at-point-hide-diagnostic-function
+      (funcall flymake-diagnostic-at-point-hide-diagnostic-function))))
 
 ;;;###autoload
 (defun flymake-diagnostic-at-point-set-timer ()
